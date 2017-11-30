@@ -16,15 +16,33 @@ import {
   RESET_STATE,
   PERSIST_REHYDRATE
 } from './constants';
-import { handler as undoHandler } from './undo';
+import undoHandler from './undo/undoHandler';
 
 type ControlAction =
   | { type: OFFLINE_STATUS_CHANGED, payload: { online: boolean } }
   | { type: OFFLINE_SCHEDULE_RETRY };
 
-const enqueue = (state: OfflineState, action: any): OfflineState => {
+const enqueue = (
+  state: OfflineState,
+  action: any,
+  config: $Shape<Config>
+): OfflineState => {
+  const waitForUndoMs =
+    action.meta && action.meta.offline && action.meta.offline.waitForUndoMs
+      ? action.meta.offline.waitForUndoMs
+      : config.waitForUndoMs;
+  const waitForUndoUntil = new Date(
+    Date.now().valueOf() + waitForUndoMs
+  ).toISOString();
   const transaction = state.lastTransaction + 1;
-  const stamped = { ...action, meta: { ...action.meta, transaction } };
+  const stamped = {
+    ...action,
+    meta: {
+      ...action.meta,
+      offline: { ...action.meta.offline, waitForUndoUntil },
+      transaction
+    }
+  };
   const { outbox } = state;
   return {
     ...state,
@@ -59,7 +77,8 @@ const initialState: OfflineState = {
 
 const offlineUpdater = function offlineUpdater(
   state: OfflineState = initialState,
-  action: ControlAction | OfflineAction | ResultAction
+  action: ControlAction | OfflineAction | ResultAction,
+  config: $Shape<Config>
 ): OfflineState {
   // Update online/offline status
   if (
@@ -113,7 +132,7 @@ const offlineUpdater = function offlineUpdater(
 
   // Add offline actions to queue
   if (action.meta && action.meta.offline) {
-    return enqueue(state, action);
+    return enqueue(state, action, config);
   }
 
   // Remove completed actions from queue (success or fail)
@@ -141,5 +160,5 @@ export const enhanceReducer = (reducer: any, config: $Shape<Config>) => (
 
   return config
     .offlineStateLens(reducer(restState, action))
-    .set(offlineUpdater(offlineState, action));
+    .set(offlineUpdater(offlineState, action, config));
 };

@@ -2,6 +2,7 @@
 /* global fetch */
 
 import type { OfflineAction } from '../types';
+import undoEffectDecorator from '../undo/undoEffectDecorator';
 
 export function NetworkError(response: {} | string, status: number) {
   this.name = 'NetworkError';
@@ -33,7 +34,7 @@ const getResponseBody = (res: any): Promise<{} | string> => {
 };
 
 // eslint-disable-next-line no-unused-vars
-export default (effect: any, _action: OfflineAction): Promise<any> => {
+const defaultEffect = (effect: any, _action: OfflineAction): Promise<any> => {
   const { url, ...options } = effect;
   const headers = { 'content-type': 'application/json', ...options.headers };
   return fetch(url, { ...options, headers }).then(res => {
@@ -45,3 +46,5 @@ export default (effect: any, _action: OfflineAction): Promise<any> => {
     });
   });
 };
+
+export default undoEffectDecorator(defaultEffect);

@@ -63,8 +63,36 @@ test("supports HMR by overriding `replaceReducer()`", () => {
   expect(store.getState()).toHaveProperty("offline");
 });
 
-test("should add item to outbox", () => {
+test("should add item to outbox with waitForUndoUntil", () => {
+  const date = new Date();
+  const waitForUndoMs = 1000;
+  global.Date.now = jest.fn(() => date);
+
   const store = offline(defaultConfig)(createStore)(defaultReducer);
+  store.replaceReducer(defaultReducer);
+  store.dispatch({
+    type: "something",
+    meta: {
+      offline: {
+        waitForUndoMs,
+        effect: {
+          url: 'some endpoint',
+        }
+      }
+    }
+  });
+  const { outbox } = store.getState().offline;
+  expect(outbox).toHaveProperty("length", 1);
+  expect(outbox[0]).toHaveProperty("meta.offline.effect.url", 'some endpoint');
+  expect(outbox[0]).toHaveProperty("meta.offline.waitForUndoUntil", new Date(date.valueOf() + waitForUndoMs).toISOString());
+});
+
+test("should add item to outbox with waitForUndoUntil based on config", () => {
+  const date = new Date();
+  const waitForUndoMs = 1000;
+  global.Date.now = jest.fn(() => date);
+
+  const store = offline({ ...defaultConfig, waitForUndoMs })(createStore)(defaultReducer);
   store.replaceReducer(defaultReducer);
   store.dispatch({
     type: "something",
@@ -79,6 +107,7 @@ test("should add item to outbox", () => {
   const { outbox } = store.getState().offline;
   expect(outbox).toHaveProperty("length", 1);
   expect(outbox[0]).toHaveProperty("meta.offline.effect.url", 'some endpoint');
+  expect(outbox[0]).toHaveProperty("meta.offline.waitForUndoUntil", new Date(date.valueOf() + waitForUndoMs).toISOString());
 });
 
 // see https://github.com/redux-offline/redux-offline/issues/4
