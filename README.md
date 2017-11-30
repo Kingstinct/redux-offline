@@ -13,6 +13,8 @@
   </a>
 </p>
 
+This fork has undo support through the 'Offline/UNDO' action. There is an 'canUndoSelector' which you can use to check whether undo is possible (returns true as long as you have at least 1 item in the outbox that is not already being sent).
+
 Persistent Redux store for _Reasonaboutable_:tm: Offline-First applications, with first-class support for optimistic UI. Use with React, React Native, or as standalone state container for any web app.
 
 _To get started, take a moment to read through the **[Offline Guide](#offline-guide)** to understand the architecture and tradeoffs behind Redux Offline, and for further context why Offline matters, read [this blog post](https://hackernoon.com/introducing-redux-offline-offline-first-architecture-for-progressive-web-applications-and-react-68c5167ecfe0)_
@@ -27,14 +29,14 @@ _To get started, take a moment to read through the **[Offline Guide](#offline-gu
 
 ## Full disclosure
 
-Redux Offline is now being maintained by a community driven team. The new versions of the library will now be available under the npm organization `@redux-offline`. Big thank you to [@jevakallio](https://github.com/jevakallio) for creating this amazing library in the first place.
+Redux Offline is now being maintained by a community driven team. The new versions of the library will now be available under the npm organization `@kingstinct`. Big thank you to [@jevakallio](https://github.com/jevakallio) for creating this amazing library in the first place.
 
 ## Quick start
 
 ##### 1. Install with npm (or [Yarn](https://yarnpkg.com))
 ```diff
 - npm install --save redux-offline
-+ npm install --save @redux-offline/redux-offline
++ npm install --save @kingstinct/redux-offline
 ```
 
 ##### 2. Add the `offline` [store enhancer](http://redux.js.org/docs/Glossary.html#store-enhancer) with `compose`
@@ -43,9 +45,9 @@ Redux Offline is now being maintained by a community driven team. The new versio
 - import { applyMiddleware, createStore } from 'redux';
 + import { applyMiddleware, createStore, compose } from 'redux';
 - import { offline } from 'redux-offline';
-+ import { offline } from '@redux-offline/redux-offline';
++ import { offline } from '@kingstinct/redux-offline';
 - import offlineConfig from 'redux-offline/lib/defaults';
-+ import offlineConfig from '@redux-offline/redux-offline/lib/defaults';
++ import offlineConfig from '@kingstinct/redux-offline/lib/defaults';
 
 // ...
 
@@ -316,9 +318,9 @@ export type Config = {
 The `offline` store enhancer takes the [configuration object](#configuration-object) as a final parameter:
 ```diff
 - import { offline } from 'redux-offline';
-+ import { offline } from '@redux-offline/redux-offline';
++ import { offline } from '@kingstinct/redux-offline';
 - import defaultConfig from 'redux-offline/lib/defaults';
-+ import defaultConfig from '@redux-offline/redux-offline/lib/defaults';
++ import defaultConfig from '@kingstinct/redux-offline/lib/defaults';
 
 const store = createStore(
   reducer,
@@ -332,9 +334,9 @@ const store = createStore(
 You can override any individual property in the default configuration:
 ```diff
 - import { offline } from 'redux-offline';
-+ import { offline } from '@redux-offline/redux-offline';
++ import { offline } from '@kingstinct/redux-offline';
 - import defaultConfig from 'redux-offline/lib/defaults';
-+ import defaultConfig from '@redux-offline/redux-offline/lib/defaults';
++ import defaultConfig from '@kingstinct/redux-offline/lib/defaults';
 
 const customConfig = {
   ...defaultConfig,
@@ -354,11 +356,11 @@ The reason for default config is defined as a separate import is, that it pulls 
 
 ```diff
 - import { offline } from 'redux-offline';
-+ import { offline } from '@redux-offline/redux-offline';
++ import { offline } from '@kingstinct/redux-offline';
 - import retry from 'redux-offline/lib/defaults/retry';
-+ import retry from '@redux-offline/redux-offline/lib/defaults/retry';
++ import retry from '@kingstinct/redux-offline/lib/defaults/retry';
 - import discard from 'redux-offline/lib/defaults/discard';
-+ import discard from '@redux-offline/redux-offline/lib/defaults/discard';
++ import discard from '@kingstinct/redux-offline/lib/defaults/discard';
 
 const myConfig = {
   retry,
@@ -445,7 +447,7 @@ const config = {
 The function is passed a callback, which you should call with boolean `true` when the app gets back online, and `false` when it goes offline.
 Additionally you can call it with an object containing as props `online` and `netInfo`. The `online` is a boolean that defines whether there's connection or not,
 the `netInfo` is an optional object containing details about the current network.
- 
+
 The default detectNetwork.js provides an object with `online` as the only property.
 
 The default detectNetwork.native.js provides both the `online` and the `netInfo` props following `react-native` netInfo possible values.
@@ -519,7 +521,7 @@ By default the offline state is stored in `state.offline`. This can be changed u
 By default, the offline middleware is inserted right before the offline store enhancer as part of its own middleware chain. If you want more control over where the middleware is inserted, consider using the alternative api, `createOffline()`.
 
 ```js
-import { createOffline } from "@redux-offline/redux-offline";
+import { createOffline } from "@kingstinct/redux-offline";
 const { middleware, enhanceReducer, enhanceStore } = createOffline(config);
 const store = createStore(
   enhanceReducer(rootReducer),
@@ -533,7 +535,7 @@ const store = createStore(
 If you want to drop any unresolved offline actions, when a user logs off for instance, dispatch a reset state event as follows:
 
 ```js
-import { RESET_STATE } from "@redux-offline/redux-offline/lib/constants";
+import { RESET_STATE } from "@kingstinct/redux-offline/lib/constants";
 store.dispatch({ type: RESET_STATE });
 ```
 
