@@ -8,13 +8,15 @@ import type {
   Config
 } from './types';
 import {
-  OFFLINE_STATUS_CHANGED,
-  OFFLINE_SCHEDULE_RETRY,
-  OFFLINE_COMPLETE_RETRY,
   OFFLINE_BUSY,
+  OFFLINE_COMPLETE_RETRY,
+  OFFLINE_SCHEDULE_RETRY,
+  OFFLINE_STATUS_CHANGED,
+  OFFLINE_UNDO,
   RESET_STATE,
   PERSIST_REHYDRATE
 } from './constants';
+import { handler as undoHandler } from './undo';
 
 type ControlAction =
   | { type: OFFLINE_STATUS_CHANGED, payload: { online: boolean } }
@@ -53,7 +55,6 @@ const initialState: OfflineState = {
     reach: 'NONE'
   }
 };
-
 // @TODO: the typing of this is all kinds of wack
 
 const offlineUpdater = function offlineUpdater(
@@ -83,6 +84,10 @@ const offlineUpdater = function offlineUpdater(
       retryCount: initialState.retryCount,
       busy: initialState.busy
     };
+  }
+
+  if (action.type === OFFLINE_UNDO) {
+    return undoHandler(state, action);
   }
 
   if (action.type === OFFLINE_SCHEDULE_RETRY) {

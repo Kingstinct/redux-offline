@@ -63,6 +63,24 @@ test("supports HMR by overriding `replaceReducer()`", () => {
   expect(store.getState()).toHaveProperty("offline");
 });
 
+test("should add item to outbox", () => {
+  const store = offline(defaultConfig)(createStore)(defaultReducer);
+  store.replaceReducer(defaultReducer);
+  store.dispatch({
+    type: "something",
+    meta: {
+      offline: {
+        effect: {
+          url: 'some endpoint',
+        }
+      }
+    }
+  });
+  const { outbox } = store.getState().offline;
+  expect(outbox).toHaveProperty("length", 1);
+  expect(outbox[0]).toHaveProperty("meta.offline.effect.url", 'some endpoint');
+});
+
 // see https://github.com/redux-offline/redux-offline/issues/4
 test("restores offline outbox when rehydrates", () => {
   const actions = [{

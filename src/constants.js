@@ -8,3 +8,4 @@ export const PERSIST_REHYDRATE = 'persist/REHYDRATE';
 export const JS_ERROR = 'Offline/JS_ERROR';
 export const DEFAULT_COMMIT = 'Offline/DEFAULT_COMMIT';
 export const DEFAULT_ROLLBACK = 'Offline/DEFAULT_ROLLBACK';
+export const OFFLINE_UNDO = 'Offline/UNDO';

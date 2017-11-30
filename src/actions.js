@@ -2,7 +2,8 @@ import {
   OFFLINE_STATUS_CHANGED,
   OFFLINE_SCHEDULE_RETRY,
   OFFLINE_COMPLETE_RETRY,
-  OFFLINE_BUSY
+  OFFLINE_BUSY,
+  OFFLINE_UNDO
 } from './constants';
 
 export const networkStatusChanged = params => {
@@ -23,6 +24,11 @@ export const scheduleRetry = (delay = 0) => ({
   payload: {
     delay
   }
+});
+
+export const undo = () => ({
+  type: OFFLINE_UNDO,
+  payload: {}
 });
 
 export const completeRetry = action => ({
