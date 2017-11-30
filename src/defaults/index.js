@@ -15,6 +15,7 @@ export default {
   effect,
   retry,
   discard,
+  waitForUndoMs: 10000,
   defaultCommit,
   defaultRollback,
   persistAutoRehydrate,

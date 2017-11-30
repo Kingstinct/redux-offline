@@ -2,6 +2,7 @@ import send from '../send';
 import { busy, scheduleRetry } from '../actions';
 import defaultCommitAction from '../defaults/defaultCommit';
 import defaultRollbackAction from '../defaults/defaultRollback';
+import WaitForUndoError from '../undo/WaitForUndoError';
 
 const DELAY = 1000;
 const completedMeta = {
@@ -43,6 +44,20 @@ test('requests resource using effects reconciler', () => {
   const { action, config, dispatch } = setup();
   send(action, dispatch, config);
   expect(config.effect).toBeCalledWith(action.meta.offline.effect, action);
+});
+
+describe('wait for undo', () => {
+  test('dispatches schedule retry action', () => {
+    const delay = 9999;
+    const effect = () => Promise.reject(new WaitForUndoError(delay));
+    const { action, config, dispatch } = setup({ effect });
+    const promise = send(action, dispatch, config);
+
+    expect.assertions(1);
+    return promise.then(() => {
+      expect(dispatch).toBeCalledWith(scheduleRetry(delay));
+    });
+  });
 });
 
 describe('when request succeeds', () => {

@@ -29,6 +29,11 @@ const send = (action: OfflineAction, dispatch, config: Config, retries = 0) => {
       }
     })
     .catch(async error => {
+      if (error && error.message === 'WaitForUndoError') {
+        dispatch(scheduleRetry(error.delay));
+        return;
+      }
+
       const rollbackAction = metadata.rollback || {
         ...config.defaultRollback,
         meta: { ...config.defaultRollback.meta, offlineAction: action }
