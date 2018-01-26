@@ -31,10 +31,13 @@ const enqueue = (
     action.meta && action.meta.offline && action.meta.offline.waitForUndoMs
       ? action.meta.offline.waitForUndoMs
       : config.waitForUndoMs;
+
   const waitForUndoUntil = new Date(
     Date.now().valueOf() + waitForUndoMs
   ).toISOString();
+
   const transaction = state.lastTransaction + 1;
+  const { outbox } = state;
   const stamped = {
     ...action,
     meta: {
@@ -43,7 +46,7 @@ const enqueue = (
       transaction
     }
   };
-  const { outbox } = state;
+
   return {
     ...state,
     lastTransaction: transaction,

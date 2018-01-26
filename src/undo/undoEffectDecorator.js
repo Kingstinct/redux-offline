@@ -8,8 +8,9 @@ const undoEffectDecorator = effectHandler => (effect, action) => {
     action.meta.offline.waitForUndoUntil
       ? new Date(action.meta.offline.waitForUndoUntil) - new Date()
       : 0;
+
   if (diff > 0) {
-    throw new WaitForUndoError(diff);
+    return Promise.reject(new WaitForUndoError(diff));
   }
   return effectHandler(effect, action);
 };

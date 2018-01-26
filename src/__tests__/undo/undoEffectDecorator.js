@@ -5,26 +5,25 @@ describe('undoEffectDecorator', () => {
     const effect = jest.fn();
     const decoratedEffect = undoEffectDecorator(effect);
 
-    let error;
-    try {
-      decoratedEffect(
-        {},
-        {
-          meta: {
-            offline: {
-              waitForUndoUntil: new Date(
-                Date.now().valueOf() + 1000
-              ).toISOString()
-            }
+    return decoratedEffect(
+      {},
+      {
+        meta: {
+          offline: {
+            waitForUndoUntil: new Date(
+              Date.now().valueOf() + 1000
+            ).toISOString()
           }
         }
-      );
-    } catch (e) {
-      error = e;
-    }
-    expect(error).toHaveProperty('message', 'WaitForUndoError');
-    expect(error.delay).toBeGreaterThan(900);
-    expect(effect).toHaveBeenCalledTimes(0);
+      }
+    ).then(
+      () => Promise.reject(new Error('Should fail')),
+      error => {
+        expect(error).toHaveProperty('message', 'WaitForUndoError');
+        expect(error.delay).toBeGreaterThan(900);
+        expect(effect).toHaveBeenCalledTimes(0);
+      }
+    );
   });
 
   it('Should ignore if waitForUndoUntil is not specified', () => {
