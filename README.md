@@ -5,11 +5,8 @@
   <a title='License' href="https://raw.githubusercontent.com/redux-offline-team/redux-offline/master/LICENSE" height="18">
     <img src='https://img.shields.io/badge/license-MIT-blue.svg' />
   </a>
-  <a href="https://badge.fury.io/js/redux-offline">
-    <img src="https://badge.fury.io/js/redux-offline.svg" alt="npm version" height="18">
-  </a>
-  <a href="https://travis-ci.org/redux-offline-team/redux-offline">
-    <img src="https://travis-ci.org/redux-offline-team/redux-offline.svg?branch=master" alt="travis" height="18">
+  <a href="https://badge.fury.io/js/@kingstinct/redux-offline">
+    <img src="https://img.shields.io/npm/v/@kingstinct/redux-offline.svg" alt="npm version" height="18">
   </a>
 </p>
 
