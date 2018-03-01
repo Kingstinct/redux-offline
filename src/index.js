@@ -115,7 +115,7 @@ export const createOffline = (userConfig: $Shape<Config> = {}) => {
 
   return {
     middleware: createOfflineMiddleware(config),
-    enhanceReducer(reducer) {
+    enhanceReducer(reducer: any) {
       return enhanceReducer(reducer, config);
     },
     enhanceStore

@@ -1,8 +1,9 @@
 {
   "name": "@kingstinct/redux-offline",
-  "version": "2.2.2",
-  "description": "Redux Offline-First Architecture (with Undo Support)",
+  "version": "2.3.2",
+  "description": "Redux Offline-First Architecture",
   "main": "lib/index.js",
+  "types": "./typings.d.ts",
   "scripts": {
     "build": "babel src --out-dir lib --ignore '**/__tests__/**'",
     "flow:start": "flow server",
@@ -29,6 +30,7 @@
   },
   "homepage": "https://github.com/kingstinct/redux-offline#readme",
   "devDependencies": {
+    "@types/redux": "^3.6.0",
     "babel-cli": "^6.26.0",
     "babel-core": "^6.26.0",
     "babel-eslint": "^7.2.3",
@@ -50,7 +52,8 @@
     "redux": "^3.6.0",
     "redux-devtools-instrument": "^1.8.2",
     "redux-logger": "^2.8.2",
-    "redux-persist-node-storage": "^1.0.2"
+    "redux-persist-node-storage": "^1.0.2",
+    "release": "^3.1.6"
   },
   "dependencies": {
     "babel-runtime": "^6.26.0",

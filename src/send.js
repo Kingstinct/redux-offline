@@ -1,16 +1,25 @@
 import { busy, scheduleRetry } from './actions';
 import { JS_ERROR } from './constants';
+import { resolveAction, rejectAction } from './offlineActionTracker';
 import type { Config, OfflineAction, ResultAction } from './types';
 
 const complete = (
   action: ResultAction,
   success: boolean,
-  payload: {}
-): ResultAction => ({
-  ...action,
-  payload,
-  meta: { ...action.meta, success, completed: true }
-});
+  payload: {},
+  offlineAction: OfflineAction
+): ResultAction => {
+  if (success) {
+    resolveAction(offlineAction.meta.transaction, payload);
+  } else {
+    rejectAction(offlineAction.meta.transaction, payload);
+  }
+  return {
+    ...action,
+    payload,
+    meta: { ...action.meta, success, completed: true }
+  };
+};
 
 const send = (action: OfflineAction, dispatch, config: Config, retries = 0) => {
   const metadata = action.meta.offline;
@@ -23,15 +32,22 @@ const send = (action: OfflineAction, dispatch, config: Config, retries = 0) => {
         meta: { ...config.defaultCommit.meta, offlineAction: action }
       };
       try {
-        dispatch(complete(commitAction, true, result));
-      } catch (e) {
-        dispatch(complete({ type: JS_ERROR, payload: e }, false));
+        return dispatch(complete(commitAction, true, result, action));
+      } catch (error) {
+        return dispatch(
+          complete(
+            { type: JS_ERROR, meta: { error } },
+            false,
+            undefined,
+            action
+          )
+        );
       }
     })
     .catch(async error => {
       if (error && error.message === 'WaitForUndoError') {
         dispatch(scheduleRetry(error.delay));
-        return;
+        return null;
       }
 
       const rollbackAction = metadata.rollback || {
@@ -50,12 +66,11 @@ const send = (action: OfflineAction, dispatch, config: Config, retries = 0) => {
       if (!mustDiscard) {
         const delay = config.retry(action, retries);
         if (delay != null) {
-          dispatch(scheduleRetry(delay));
-          return;
+          return dispatch(scheduleRetry(delay));
         }
       }
 
-      dispatch(complete(rollbackAction, false, error));
+      return dispatch(complete(rollbackAction, false, error, action));
     });
 };
 
